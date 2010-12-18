@@ -10,7 +10,7 @@ package
 	
 	public class Participant extends FlxSprite
 	{
-		[Embed(source = '../data/characters/participant.png')] private var imgParticipant:Class;
+		[Embed(source = '../data/characters/participant.png')] public var imgParticipant:Class;
 		
 		public function Participant(fYPos:Number) 
 		{
@@ -18,7 +18,6 @@ package
 			loadGraphic(imgParticipant);
 			
 			x = FlxU.random() * (FlxG.width - width);
-			//y = FlxG.height*0.5 + FlxU.random() * (FlxG.height*0.5) - height+4;
 		}
 	}
 }

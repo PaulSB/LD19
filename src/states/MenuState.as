@@ -18,12 +18,20 @@ package states
 			
 			// Title text
 			var tTxt:FlxText;
-			tTxt = new FlxText(0, FlxG.height / 2 -64, FlxG.width, "LD 19");
-			tTxt.setFormat("Istria", 64, 0xfff2f2f2, "center");
+			tTxt = new FlxText(0, 40, FlxG.width,
+					"The Prophecy tells of The Five, the young band of "
+					+"warriors who would meet the Demon Lord in combat "
+					+"before his War of Chaos could decimate the land we "
+					+"have called home since the days of our ancestors.\n\n"
+					+"The time of The Prophecy is at hand. It is time for "
+					+"The Five to discover their potential and rise to their calling, or else for everything "
+					+"we know and love to be torn asunder and left to burn.\n\n"
+					+"It is time.");
+			tTxt.setFormat("Istria", 32, 0xfff2f2f2, "center");
 			add(tTxt);
 			
 			// Instruction text
-			tTxt = new FlxText(0, FlxG.height -40, FlxG.width, "Press SPACE to PLAY");
+			tTxt = new FlxText(0, FlxG.height -32, FlxG.width, "Press SPACE to PLAY");
 			tTxt.setFormat("Istria", 20, 0xfff2f2f2, "center");
 			add(tTxt);			
 		}
