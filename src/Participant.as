@@ -12,13 +12,13 @@ package
 	{
 		[Embed(source = '../data/characters/participant.png')] private var imgParticipant:Class;
 		
-		public function Participant() 
+		public function Participant(fYPos:Number) 
 		{
-			super(0, 0);
+			super(0, fYPos);
 			loadGraphic(imgParticipant);
 			
 			x = FlxU.random() * (FlxG.width - width);
-			y = FlxG.height*0.5 + FlxU.random() * (FlxG.height*0.5) - height+4;
+			//y = FlxG.height*0.5 + FlxU.random() * (FlxG.height*0.5) - height+4;
 		}
 	}
 }
