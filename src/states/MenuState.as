@@ -30,10 +30,14 @@ package states
 			tTxt.setFormat("Istria", 32, 0xfff2f2f2, "center");
 			add(tTxt);
 			
+			// Shadow
+			tTxt = new FlxText(0, FlxG.height -32 +2, FlxG.width +2, "Press 1 to begin");
+			tTxt.setFormat("Istria", 20, 0xff000000, "center");
+			add(tTxt);
 			// Instruction text
-			tTxt = new FlxText(0, FlxG.height -32, FlxG.width, "Press SPACE to PLAY");
+			tTxt = new FlxText(0, FlxG.height -32, FlxG.width, "Press 1 to begin");
 			tTxt.setFormat("Istria", 20, 0xfff2f2f2, "center");
-			add(tTxt);			
+			add(tTxt);
 		}
 		
 		override public function update():void

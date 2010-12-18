@@ -31,7 +31,7 @@ package states
 		private var m_tInstructionsShadow:FlxText;
 		
 		private var m_fFadeInTimer:Number = 1.0;
-		private var m_iNumParticipants:int = 10;
+		private var m_iNumParticipants:int = 50;
 		
 		override public function create():void
 		{
@@ -92,9 +92,50 @@ package states
 			{
 				m_tBlackScrn.alpha = m_fFadeInTimer;
 				m_fFadeInTimer -= FlxG.elapsed;
+				
+				super.update();
+				return;
 			}
 			
 			super.update();
+			
+			processInput();
+		}
+		
+		private function processInput():void
+		{
+			if (m_tParticipantList.getIsActive())
+			{
+				// Participant list view
+				
+				if (FlxG.keys.justPressed("ONE"))
+				{
+					m_tParticipantList.setIsActive(false);
+					
+					m_tInstructions.text = "1 - Show participants";
+					m_tInstructionsShadow.text = "1 - Show participants";
+				}
+				else if (FlxG.keys.justPressed("UP"))
+				{
+					m_tParticipantList.moveSelectionUp();
+				}
+				else if (FlxG.keys.justPressed("DOWN"))
+				{
+					m_tParticipantList.moveSelectionDown();
+				}
+			}
+			else
+			{
+				// Standard (hub) view
+				
+				if (FlxG.keys.justPressed("ONE"))
+				{
+					m_tParticipantList.setIsActive(true);
+					
+					m_tInstructions.text = "1 - Hide participants";
+					m_tInstructionsShadow.text = "1 - Hide participants";
+				}
+			}
 		}
 	}
 }
