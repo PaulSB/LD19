@@ -273,7 +273,10 @@ package states
 							for (i = 0; i < m_aParticipants.members.length; i++)
 							{
 								if (m_aParticipants.members[i].m_bEliminate)
+								{
+									m_aParticipants.members[i].exists = false;
 									m_aParticipants.members.splice(i--, 1);
+								}
 							}
 							
 							m_tParticipantList.setIsActive(false);
@@ -286,6 +289,7 @@ package states
 					// From here want to ignore training types and just use elimination stuff
 					for (i = 0; i < m_aParticipants.members.length; i++)
 					{
+						m_aParticipants.members[i].m_bReportView = false;
 						m_aParticipants.members[i].m_bEliminationView = true;
 					}
 					
@@ -304,7 +308,17 @@ package states
 			
 			for (var i:int = 0; i < m_aParticipants.members.length; i++)
 			{
-				m_aParticipants.members[i].ageOneYear();
+				var pThisGuy:Participant = m_aParticipants.members[i];
+				pThisGuy.ageOneYear();
+				
+				if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
+					pThisGuy.m_bRevealDefend = true;
+				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
+					pThisGuy.m_bRevealMelee = true;
+				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
+					pThisGuy.m_bRevealRanged = true;
+				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
+					pThisGuy.m_bRevealMagic = true;
 			}
 		}
 	}

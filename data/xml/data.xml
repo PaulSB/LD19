@@ -27,6 +27,14 @@
 		<Forename>Alibut</Forename>
 		<Forename>Spent</Forename>
 		<Forename>Viktor</Forename>
+		<Forename>Turquey</Forename>
+		<Forename>Bernard</Forename>
+		<Forename>Fester</Forename>
+		<Forename>Sallam</Forename>
+		<Forename>Wrent</Forename>
+		<Forename>Gertie</Forename>
+		<Forename>Onion</Forename>
+		<Forename>Revolver</Forename>
 		
 		<Surname>Abraham</Surname>
 		<Surname>Benedict</Surname>
@@ -52,10 +60,19 @@
 		<Surname>Sandbag</Surname>
 		<Surname>Warwhale</Surname>
 		<Surname>Danson</Surname>
+		<Surname>Country</Surname>
+		<Surname>Burglar</Surname>
+		<Surname>Beast</Surname>
+		<Surname>Sidebum</Surname>
+		<Surname>Fest</Surname>
+		<Surname>Sherbert</Surname>
+		<Surname>Gimcrack</Surname>
+		<Surname>Gewjaw</Surname>
+
 	</Names>
 	
 	<YearStartText>
-		<Text>Placeholder Year 1 tip text!</Text>
+		<Text>Look at these weak younglings! Their ability is nothing to speak of...yet! I recommend sticking to assessments of potential this year.</Text>
 		<Text>Placeholder Year 2 tip text!</Text>
 		<Text>Placeholder Year 3 tip text!</Text>
 		<Text>Placeholder Year 4 tip text!</Text>

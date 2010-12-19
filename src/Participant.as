@@ -33,11 +33,11 @@ package
 		// STATS:
 		private var m_iAge:int = 1;	// equal to current year, max 5
 		
-		private var m_iPotentialDefend:int;
-		private var m_iPotentialMelee:int;
-		private var m_iPotentialRanged:int;
-		private var m_iPotentialMagic:int;
-		private var m_iPotentialOverall:int;
+		public var m_iPotentialDefend:int;
+		public var m_iPotentialMelee:int;
+		public var m_iPotentialRanged:int;
+		public var m_iPotentialMagic:int;
+		public var m_iPotentialOverall:int;
 
 		public var m_iCurrentDefend:int;
 		public var m_iCurrentMelee:int;
@@ -45,7 +45,13 @@ package
 		public var m_iCurrentMagic:int;
 		public var m_iCurrentOverall:int;
 		
+		public var m_bRevealDefend:Boolean;
+		public var m_bRevealMelee:Boolean;
+		public var m_bRevealRanged:Boolean;
+		public var m_bRevealMagic:Boolean;
+		
 		public var m_iThisYearTraining:int;
+		public var m_bReportView:Boolean = false;
 		public var m_bEliminationView:Boolean = false;
 		public var m_bEliminate:Boolean = false;
 		
@@ -121,6 +127,8 @@ package
 			m_iCurrentRanged = m_iPotentialRanged * fMod;
 			m_iCurrentMagic = m_iPotentialMagic * fMod;
 			m_iCurrentOverall = m_iPotentialOverall * fMod;
+			
+			m_bReportView = true;
 		}
 	}
 }

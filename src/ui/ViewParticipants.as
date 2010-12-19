@@ -180,30 +180,46 @@ package ui
 				}
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
 				{
-					m_aStatText.members[j].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
+					if (pThisGuy.m_bRevealDefend)
+						m_aStatText.members[j].text = "Defence potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialDefend);
+					else
+						m_aStatText.members[j].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
+						
 					if (!pThisGuy.m_bEliminationView)
 						m_aSkillImages.members[j].loadGraphic(imgSkillDefend);
 				}
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
 				{
-					m_aStatText.members[j].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
+					if (pThisGuy.m_bRevealMelee)
+						m_aStatText.members[j].text = "Melee potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialMelee);
+					else
+						m_aStatText.members[j].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
+					
 					if (!pThisGuy.m_bEliminationView)
 						m_aSkillImages.members[j].loadGraphic(imgSkillMelee);
 				}
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
 				{
-					m_aStatText.members[j].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
+					if (pThisGuy.m_bRevealRanged)
+						m_aStatText.members[j].text = "Ranged potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialRanged);
+					else
+						m_aStatText.members[j].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
+					
 					if (!pThisGuy.m_bEliminationView)
 						m_aSkillImages.members[j].loadGraphic(imgSkillRanged);
 				}
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
 				{
-					m_aStatText.members[j].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
+					if (pThisGuy.m_bRevealMagic)
+						m_aStatText.members[j].text = "Magic potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialMagic);
+					else
+						m_aStatText.members[j].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
+					
 					if (!pThisGuy.m_bEliminationView)
 						m_aSkillImages.members[j].loadGraphic(imgSkillMagic);
 				}
 				
-				if (!pThisGuy.m_bEliminationView)
+				if (!pThisGuy.m_bEliminationView && !pThisGuy.m_bReportView)
 				{
 					if (pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_ASSESS_DEFEND
 						&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_ASSESS_MAGIC)
@@ -214,6 +230,8 @@ package ui
 					else
 						m_aSkillText.members[j].text = "";
 				}
+				else
+					m_aSkillText.members[j].text = "";
 			}
 			
 			m_tArrowUp.color = (m_iCurrentIndex == 0) ? 0x797979 : 0xffffff;
@@ -222,19 +240,22 @@ package ui
 		
 		public function setIsActive(bActive:Boolean):void
 		{
-			// Reset previous skill selections
-			for (var i:int = 0; i < PlayState.m_aParticipants.members.length; i++)
+			// Reset previous skill selections if setting up
+			if (bActive)
 			{
-				var pThisGuy:Participant = PlayState.m_aParticipants.members[i];
-				if(pThisGuy.m_iThisYearTraining > pThisGuy.e_SKILL_DO_NOTHING)
-					pThisGuy.m_iThisYearTraining = pThisGuy.e_SKILL_DO_NOTHING;
+				for (var i:int = 0; i < PlayState.m_aParticipants.members.length; i++)
+				{
+					var pThisGuy:Participant = PlayState.m_aParticipants.members[i];
+					if(pThisGuy.m_iThisYearTraining > pThisGuy.e_SKILL_DO_NOTHING)
+						pThisGuy.m_iThisYearTraining = pThisGuy.e_SKILL_DO_NOTHING;
+				}
+			
+				m_iCurrentIndex = 0;
+				m_iCurrentSelection = 0;
+				m_tSelectArrow.y = m_aBackingBoxes.members[0].y;
+				
+				rePopulateList();
 			}
-			
-			m_iCurrentIndex = 0;
-			m_iCurrentSelection = 0;
-			m_tSelectArrow.y = m_aBackingBoxes.members[0].y;
-			
-			rePopulateList();
 			
 			m_bActive = bActive;
 			m_aGraphics.exists = m_bActive;
@@ -297,22 +318,38 @@ package ui
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
 			{
-				m_aStatText.members[iIndex].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
+				if (pThisGuy.m_bRevealDefend)
+					m_aStatText.members[iIndex].text = "Defence potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialDefend);
+				else
+					m_aStatText.members[iIndex].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
+				
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillDefend);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
 			{
-				m_aStatText.members[iIndex].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
+				if (pThisGuy.m_bRevealMelee)
+					m_aStatText.members[iIndex].text = "Melee potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialMelee);
+				else
+					m_aStatText.members[iIndex].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
+				
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillMelee);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
 			{
-				m_aStatText.members[iIndex].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
+				if (pThisGuy.m_bRevealRanged)
+					m_aStatText.members[iIndex].text = "Ranged potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialRanged);
+				else
+					m_aStatText.members[iIndex].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
+				
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillRanged);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
 			{
-				m_aStatText.members[iIndex].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
+				if (pThisGuy.m_bRevealMagic)
+					m_aStatText.members[iIndex].text = "Magic potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialMagic);
+				else
+					m_aStatText.members[iIndex].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
+				
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillMagic);
 			}
 				
@@ -352,25 +389,41 @@ package ui
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
 			{
-				m_aStatText.members[iIndex].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
+				if (pThisGuy.m_bRevealDefend)
+					m_aStatText.members[iIndex].text = "Defence potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialDefend);
+				else
+					m_aStatText.members[iIndex].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
+				
 				if (!pThisGuy.m_bEliminationView)
 						m_aSkillImages.members[iIndex].loadGraphic(imgSkillDefend);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
 			{
-				m_aStatText.members[iIndex].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
+				if (pThisGuy.m_bRevealMelee)
+					m_aStatText.members[iIndex].text = "Melee potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialMelee);
+				else
+					m_aStatText.members[iIndex].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
+				
 				if (!pThisGuy.m_bEliminationView)
 						m_aSkillImages.members[iIndex].loadGraphic(imgSkillMelee);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
 			{
-				m_aStatText.members[iIndex].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
+				if (pThisGuy.m_bRevealRanged)
+					m_aStatText.members[iIndex].text = "Ranged potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialRanged);
+				else
+					m_aStatText.members[iIndex].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
+				
 				if (!pThisGuy.m_bEliminationView)
 						m_aSkillImages.members[iIndex].loadGraphic(imgSkillRanged);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
 			{
-				m_aStatText.members[iIndex].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
+				if (pThisGuy.m_bRevealMagic)
+					m_aStatText.members[iIndex].text = "Magic potential:  " + pThisGuy.getRatingStr(pThisGuy.m_iPotentialMagic);
+				else
+					m_aStatText.members[iIndex].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
+				
 				if (!pThisGuy.m_bEliminationView)
 						m_aSkillImages.members[iIndex].loadGraphic(imgSkillMagic);
 			}
