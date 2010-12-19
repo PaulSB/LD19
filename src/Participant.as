@@ -31,6 +31,8 @@ package
 		private var m_bWobbleUp:Boolean;
 		
 		// STATS:
+		private var m_iAge:int = 1;	// equal to current year, max 5
+		
 		private var m_iPotentialDefend:int;
 		private var m_iPotentialMelee:int;
 		private var m_iPotentialRanged:int;
@@ -44,6 +46,8 @@ package
 		public var m_iCurrentOverall:int;
 		
 		public var m_iThisYearTraining:int;
+		public var m_bEliminationView:Boolean = false;
+		public var m_bEliminate:Boolean = false;
 		
 		public function Participant(fYPos:Number) 
 		{
@@ -68,11 +72,12 @@ package
 			m_iPotentialOverall = (m_iPotentialDefend + m_iPotentialMelee + m_iPotentialRanged + m_iPotentialMagic) / 4;
 			
 			// Ability as per year 1/5
-			m_iCurrentDefend = m_iPotentialDefend * 0.2;
-			m_iCurrentMelee = m_iPotentialMelee * 0.2;
-			m_iCurrentRanged = m_iPotentialRanged * 0.2;
-			m_iCurrentMagic = m_iPotentialMagic * 0.2;
-			m_iCurrentOverall = m_iPotentialOverall * 0.2;
+			var fMod:Number = m_iAge / 5.0;
+			m_iCurrentDefend = m_iPotentialDefend * fMod;
+			m_iCurrentMelee = m_iPotentialMelee * fMod;
+			m_iCurrentRanged = m_iPotentialRanged * fMod;
+			m_iCurrentMagic = m_iPotentialMagic * fMod;
+			m_iCurrentOverall = m_iPotentialOverall * fMod;
 		}
 		
 		override public function update():void 
@@ -92,7 +97,7 @@ package
 			super.update();
 		}
 		
-		public function GetRatingStr(iScore:int):String
+		public function getRatingStr(iScore:int):String
 		{
 			if(iScore < 20)
 				return "Terrible";
@@ -104,6 +109,18 @@ package
 				return "Good";
 			else
 				return "Excellent";
+		}
+		
+		public function ageOneYear():void
+		{
+			m_iAge++;
+			
+			var fMod:Number = m_iAge / 5.0;
+			m_iCurrentDefend = m_iPotentialDefend * fMod;
+			m_iCurrentMelee = m_iPotentialMelee * fMod;
+			m_iCurrentRanged = m_iPotentialRanged * fMod;
+			m_iCurrentMagic = m_iPotentialMagic * fMod;
+			m_iCurrentOverall = m_iPotentialOverall * fMod;
 		}
 	}
 }

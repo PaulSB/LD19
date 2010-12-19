@@ -20,8 +20,9 @@ package states
 		// Constants
 		private const e_STATE_YEARINTRO:int = 0;
 		private const e_STATE_YEARSTART:int = 1;
-		private const e_STATE_YEARMID:int = 2;	// Non-interactive state where the year's activities just "happen"
+		private const e_STATE_YEARMID:int = 2;		// Non-interactive state where the year's activities just "happen"
 		private const e_STATE_YEAREND:int = 3;
+		private const e_STATE_ELIMINATION:int = 4;	
 			
 		// Render layers:
 		static private var s_layerBackground:FlxGroup;
@@ -41,7 +42,7 @@ package states
 		
 		private var m_fFadeInTimer:Number = 1.0;
 		private var m_fFadeThroughTimer:Number = 0.0;
-		private var m_iNumParticipants:int = 50;
+		//private var m_iNumParticipants:int = 50;
 
 		private var m_iCurrentState:int = e_STATE_YEARINTRO;
 		
@@ -54,8 +55,8 @@ package states
 			
 			// The participants...
 			m_aParticipants = new FlxGroup;
-			var fNumParticipants:Number = m_iNumParticipants;
-			for (var i:int = 0; i < m_iNumParticipants; i++)
+			var fNumParticipants:Number = 50;
+			for (var i:int = 0; i < 50; i++)
 			{
 				var fY:Number = FlxG.height*0.5 + (i / fNumParticipants) * (FlxG.height*0.5);
 				m_aParticipants.add(new Participant(fY));
@@ -186,6 +187,13 @@ package states
 				}
 				else
 				{
+					// Reset assignments
+					for (i = 0; i < m_aParticipants.members.length; i++)
+					{
+						m_aParticipants.members[i].m_bEliminationView = false;
+						m_aParticipants.members[i].m_iThisYearTraining = m_aParticipants.members[i].e_SKILL_DO_NOTHING;
+					}
+					
 					m_tParticipantList.setIsActive(true);
 					var iYearsToGo:int = 5 - m_iCurrentYear;
 					m_tParticipantList.setYearText(iYearsToGo.toString() + " years remain");
@@ -211,16 +219,92 @@ package states
 						// Toggle an assessment option for current entry
 						m_tParticipantList.toggleView();
 					}
+					if (FlxG.keys.justPressed("TWO"))
+					{
+						m_tParticipantList.setIsActive(false);
+						m_iCurrentState = e_STATE_ELIMINATION;
+					}
 				}
 				else
 				{
+					proceedOneYear();
+					
 					m_tParticipantList.setIsActive(true);
-					var iThisYear:int = m_iCurrentYear + 1;
+					var iThisYear:int = m_iCurrentYear;
 					m_tParticipantList.setYearText("End of Year " + iThisYear.toString() + " Report");
 					
 					m_tInstructions.text = "1 - Toggle skill view, 2 - Begin elimination";
 					m_tInstructionsShadow.text = "1 - Toggle skill view, 2 - Begin elimination";
 				}
+			}
+			else if (m_iCurrentState == e_STATE_ELIMINATION)
+			{
+				if (m_tParticipantList.getIsActive())
+				{
+					if (FlxG.keys.justPressed("UP"))
+					{
+						m_tParticipantList.moveSelectionUp();
+					}
+					else if (FlxG.keys.justPressed("DOWN"))
+					{
+						m_tParticipantList.moveSelectionDown();
+					}
+					else if (FlxG.keys.justPressed("ONE"))
+					{
+						m_tParticipantList.toggleView();
+					}
+					else if (FlxG.keys.justPressed("TWO"))
+					{
+						// Toggle whether to eliminate current entry
+						m_tParticipantList.toggleElimination();
+					}
+					else if (FlxG.keys.justPressed("THREE"))
+					{
+						var iCount:int = 0;
+						for (var i:int = 0; i < m_aParticipants.members.length; i++)
+						{
+							if (m_aParticipants.members[i].m_bEliminate)
+								iCount++;
+						}
+						
+						if (iCount == 10)
+						{
+							// ELIMINATE!
+							for (i = 0; i < m_aParticipants.members.length; i++)
+							{
+								if (m_aParticipants.members[i].m_bEliminate)
+									m_aParticipants.members.splice(i--, 1);
+							}
+							
+							m_tParticipantList.setIsActive(false);
+							m_iCurrentState = e_STATE_YEARINTRO;
+						}
+					}
+				}
+				else
+				{
+					// From here want to ignore training types and just use elimination stuff
+					for (i = 0; i < m_aParticipants.members.length; i++)
+					{
+						m_aParticipants.members[i].m_bEliminationView = true;
+					}
+					
+					m_tParticipantList.setIsActive(true);
+					m_tParticipantList.setYearText("Select the 10 participants to eliminate");
+					
+					m_tInstructions.text = "1 - Toggle skill view, 2 - Toggle elimination, 3 - Confirm choices";
+					m_tInstructionsShadow.text = "1 - Toggle skill view, 2 - Toggle elimination, 3 - Confirm choices";
+				}
+			}
+		}
+		
+		private function proceedOneYear():void
+		{
+			m_iCurrentYear++;
+			
+			for (var i:int = 0; i < m_aParticipants.members.length; i++)
+			{
+				m_aParticipants.members[i].ageOneYear();
 			}
 		}
 	}

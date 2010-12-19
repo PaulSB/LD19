@@ -22,6 +22,9 @@ package ui
 		[Embed(source = '../../data/ui/skill_ranged.png')] private var imgSkillRanged:Class;
 		[Embed(source = '../../data/ui/skill_magic.png')] private var imgSkillMagic:Class;
 		
+		[Embed(source = '../../data/ui/skill_tick.png')] private var imgTick:Class;
+		[Embed(source = '../../data/ui/skill_cross.png')] private var imgCross:Class;
+		
 		private const k_iNumEntriesOnScreen:int = 10;
 		
 		public var m_aGraphics:FlxGroup;
@@ -126,7 +129,7 @@ package ui
 				
 				// Showing overall ability
 				var tStat:FlxText = new FlxText(FlxG.width * 0.5 +10, tText.y + 4, FlxG.width * 0.5,
-												"Overall ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall));
+												"Overall ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentOverall));
 				tStat.setFormat("Istria", 16, 0xff2d1601, "left");
 				m_aStatText.add(tStat);
 				
@@ -162,40 +165,55 @@ package ui
 				
 				m_aNameText.members[j].text = pThisGuy.m_sForename + " " + pThisGuy.m_sSurname;
 				
+				if (pThisGuy.m_bEliminationView)
+				{
+					// ELIMINATION MODE special case
+					var pGraphic:Class = pThisGuy.m_bEliminate ? imgCross : imgTick;
+					m_aSkillImages.members[j].loadGraphic(pGraphic);
+				}
+				
 				if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_DO_NOTHING)
 				{
-					m_aStatText.members[j].text = "Overall ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall);
-					m_aSkillImages.members[j].loadGraphic(imgSkillNone);
+					m_aStatText.members[j].text = "Overall ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentOverall);
+					if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[j].loadGraphic(imgSkillNone);
 				}
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
 				{
-					m_aStatText.members[j].text = "Defence ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentDefend);
-					m_aSkillImages.members[j].loadGraphic(imgSkillDefend);
+					m_aStatText.members[j].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
+					if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[j].loadGraphic(imgSkillDefend);
 				}
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
 				{
-					m_aStatText.members[j].text = "Melee ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentMelee);
-					m_aSkillImages.members[j].loadGraphic(imgSkillMelee);
+					m_aStatText.members[j].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
+					if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[j].loadGraphic(imgSkillMelee);
 				}
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
 				{
-					m_aStatText.members[j].text = "Ranged ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentRanged);
-					m_aSkillImages.members[j].loadGraphic(imgSkillRanged);
+					m_aStatText.members[j].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
+					if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[j].loadGraphic(imgSkillRanged);
 				}
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
 				{
-					m_aStatText.members[j].text = "Magic ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentMagic);
-					m_aSkillImages.members[j].loadGraphic(imgSkillMagic);
+					m_aStatText.members[j].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
+					if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[j].loadGraphic(imgSkillMagic);
 				}
-					
-				if (pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_ASSESS_DEFEND
-					&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_ASSESS_MAGIC)
-					m_aSkillText.members[j].text = "ASSESS";
-				else if(pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_TRAIN_DEFEND
-					&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_TRAIN_MAGIC)
-					m_aSkillText.members[j].text = "TRAIN";
-				else
-					m_aSkillText.members[j].text = "";
+				
+				if (!pThisGuy.m_bEliminationView)
+				{
+					if (pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_ASSESS_DEFEND
+						&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_ASSESS_MAGIC)
+						m_aSkillText.members[j].text = "ASSESS";
+					else if(pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_TRAIN_DEFEND
+						&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_TRAIN_MAGIC)
+						m_aSkillText.members[j].text = "TRAIN";
+					else
+						m_aSkillText.members[j].text = "";
+				}
 			}
 			
 			m_tArrowUp.color = (m_iCurrentIndex == 0) ? 0x797979 : 0xffffff;
@@ -208,7 +226,8 @@ package ui
 			for (var i:int = 0; i < PlayState.m_aParticipants.members.length; i++)
 			{
 				var pThisGuy:Participant = PlayState.m_aParticipants.members[i];
-				pThisGuy.m_iThisYearTraining = pThisGuy.e_SKILL_DO_NOTHING;
+				if(pThisGuy.m_iThisYearTraining > pThisGuy.e_SKILL_DO_NOTHING)
+					pThisGuy.m_iThisYearTraining = pThisGuy.e_SKILL_DO_NOTHING;
 			}
 			
 			m_iCurrentIndex = 0;
@@ -273,27 +292,27 @@ package ui
 			var iIndex:int = m_iCurrentSelection - m_iCurrentIndex;
 			if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_DO_NOTHING)
 			{
-				m_aStatText.members[iIndex].text = "Overall ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall);
+				m_aStatText.members[iIndex].text = "Overall ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentOverall);
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillNone);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
 			{
-				m_aStatText.members[iIndex].text = "Defence ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentDefend);
+				m_aStatText.members[iIndex].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillDefend);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
 			{
-				m_aStatText.members[iIndex].text = "Melee ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentMelee);
+				m_aStatText.members[iIndex].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillMelee);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
 			{
-				m_aStatText.members[iIndex].text = "Ranged ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentRanged);
+				m_aStatText.members[iIndex].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillRanged);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
 			{
-				m_aStatText.members[iIndex].text = "Magic ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentMagic);
+				m_aStatText.members[iIndex].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
 				m_aSkillImages.members[iIndex].loadGraphic(imgSkillMagic);
 			}
 				
@@ -318,30 +337,59 @@ package ui
 				
 			// Change image/stat text...
 			var iIndex:int = m_iCurrentSelection - m_iCurrentIndex;
+			if (pThisGuy.m_bEliminationView)
+			{
+				// ELIMINATION MODE special case
+				var pGraphic:Class = pThisGuy.m_bEliminate ? imgCross : imgTick;
+				m_aSkillImages.members[iIndex].loadGraphic(pGraphic);
+			}
+			
 			if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_DO_NOTHING)
 			{
-				m_aStatText.members[iIndex].text = "Overall ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall);
-				m_aSkillImages.members[iIndex].loadGraphic(imgSkillNone);
+				m_aStatText.members[iIndex].text = "Overall ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentOverall);
+				if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[iIndex].loadGraphic(imgSkillNone);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
 			{
-				m_aStatText.members[iIndex].text = "Defence ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentDefend);
-				m_aSkillImages.members[iIndex].loadGraphic(imgSkillDefend);
+				m_aStatText.members[iIndex].text = "Defence ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentDefend);
+				if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[iIndex].loadGraphic(imgSkillDefend);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
 			{
-				m_aStatText.members[iIndex].text = "Melee ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentMelee);
-				m_aSkillImages.members[iIndex].loadGraphic(imgSkillMelee);
+				m_aStatText.members[iIndex].text = "Melee ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMelee);
+				if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[iIndex].loadGraphic(imgSkillMelee);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
 			{
-				m_aStatText.members[iIndex].text = "Ranged ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentRanged);
-				m_aSkillImages.members[iIndex].loadGraphic(imgSkillRanged);
+				m_aStatText.members[iIndex].text = "Ranged ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentRanged);
+				if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[iIndex].loadGraphic(imgSkillRanged);
 			}
 			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
 			{
-				m_aStatText.members[iIndex].text = "Magic ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentMagic);
-				m_aSkillImages.members[iIndex].loadGraphic(imgSkillMagic);
+				m_aStatText.members[iIndex].text = "Magic ability:  " + pThisGuy.getRatingStr(pThisGuy.m_iCurrentMagic);
+				if (!pThisGuy.m_bEliminationView)
+						m_aSkillImages.members[iIndex].loadGraphic(imgSkillMagic);
+			}
+		}
+		
+		public function toggleElimination():void
+		{
+			var pThisGuy:Participant = PlayState.m_aParticipants.members[m_iCurrentSelection];
+
+			var iIndex:int = m_iCurrentSelection - m_iCurrentIndex;
+			if (pThisGuy.m_bEliminate)
+			{
+				pThisGuy.m_bEliminate = false;
+				m_aSkillImages.members[iIndex].loadGraphic(imgTick);
+			}
+			else
+			{
+				pThisGuy.m_bEliminate = true;
+				m_aSkillImages.members[iIndex].loadGraphic(imgCross);
 			}
 		}
 		
