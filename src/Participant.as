@@ -26,6 +26,10 @@ package
 		public var m_sForename:String;
 		public var m_sSurname:String;
 		
+		private var m_fFixedYPos:Number;
+		private var m_fWobbleTimer:Number;
+		private var m_bWobbleUp:Boolean;
+		
 		// STATS:
 		private var m_iPotentialDefend:int;
 		private var m_iPotentialMelee:int;
@@ -47,6 +51,11 @@ package
 			loadGraphic(imgParticipant);
 			
 			x = FlxU.random() * (FlxG.width - width);
+			y -= height - 16;
+			m_fFixedYPos = y;
+			
+			m_fWobbleTimer = (FlxU.random() - 0.5) * 2;	// -1 to +1
+			m_bWobbleUp = (m_fWobbleTimer > 0);
 			
 			// Set attributes:		
 			m_sForename = XmlData.m_aForenames.shift();
@@ -64,6 +73,23 @@ package
 			m_iCurrentRanged = m_iPotentialRanged * 0.2;
 			m_iCurrentMagic = m_iPotentialMagic * 0.2;
 			m_iCurrentOverall = m_iPotentialOverall * 0.2;
+		}
+		
+		override public function update():void 
+		{
+			if (m_bWobbleUp)
+				m_fWobbleTimer -= FlxG.elapsed;
+			else
+				m_fWobbleTimer += FlxG.elapsed;
+			
+			if (m_fWobbleTimer > 1.0)
+				m_bWobbleUp = true;
+			else if (m_fWobbleTimer < -1.0)
+				m_bWobbleUp = false;
+			
+			y = (m_bWobbleUp) ? (m_fFixedYPos - 2 ): (m_fFixedYPos + 2);
+			
+			super.update();
 		}
 		
 		public function GetRatingStr(iScore:int):String

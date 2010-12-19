@@ -5,6 +5,7 @@ package states
 	import org.flixel.FlxSprite;
 	import org.flixel.FlxState;
 	import org.flixel.FlxText;
+	import ui.DialogBox;
 	import ui.ViewParticipants;
 	/**
 	 * LD19 - "Discovery"
@@ -17,7 +18,10 @@ package states
 		[Embed(source = '../../data/ui/black.png')] private var imgBlack:Class;
 		
 		// Constants
-		private const e_STATE_YEARSTART:int = 0;
+		private const e_STATE_YEARINTRO:int = 0;
+		private const e_STATE_YEARSTART:int = 1;
+		private const e_STATE_YEARMID:int = 2;	// Non-interactive state where the year's activities just "happen"
+		private const e_STATE_YEAREND:int = 3;
 			
 		// Render layers:
 		static private var s_layerBackground:FlxGroup;
@@ -26,18 +30,20 @@ package states
 		static private var s_layerOverlay:FlxGroup;
 		
 		static public var m_aParticipants:FlxGroup;
-		static public var m_iCurrentYear:int = 0;		// Start by advancing to year 1. 5 is last year. 6 represents endgame.
+		static public var m_iCurrentYear:int = 0;		// 0 = year1/5, 4 = year 5/5, 5 = endgame
 		private var m_tBG:FlxSprite;
 		private var m_tBlackScrn:FlxSprite;
 		private var m_tParticipantList:ViewParticipants;
+		private var m_tDialogBox:DialogBox;
 		
 		private var m_tInstructions:FlxText;
 		private var m_tInstructionsShadow:FlxText;
 		
 		private var m_fFadeInTimer:Number = 1.0;
+		private var m_fFadeThroughTimer:Number = 0.0;
 		private var m_iNumParticipants:int = 50;
 
-		private var m_iCurrentState:int = e_STATE_YEARSTART;
+		private var m_iCurrentState:int = e_STATE_YEARINTRO;
 		
 		override public function create():void
 		{
@@ -53,11 +59,11 @@ package states
 			{
 				var fY:Number = FlxG.height*0.5 + (i / fNumParticipants) * (FlxG.height*0.5);
 				m_aParticipants.add(new Participant(fY));
-				m_aParticipants.members[i].y -= (m_aParticipants.members[i].height - 16);
 			}
 			
 			// UI overlays
 			m_tParticipantList = new ViewParticipants;
+			m_tDialogBox = new DialogBox;
 			
 			// Instruction text
 			m_tInstructions = new FlxText(0, FlxG.height -32, FlxG.width, "");
@@ -77,6 +83,7 @@ package states
 			
 			s_layerForeground = new FlxGroup;
 			s_layerForeground.add(m_tParticipantList.m_aGraphics);
+			s_layerForeground.add(m_tDialogBox.m_aGraphics);
 			s_layerForeground.add(m_tInstructionsShadow);
 			s_layerForeground.add(m_tInstructions);
 			
@@ -96,14 +103,31 @@ package states
 			
 			if (m_fFadeInTimer > 0)
 			{
-				if (m_iCurrentState != e_STATE_YEARSTART)
-					m_iCurrentState = e_STATE_YEARSTART;
+				if (m_iCurrentState != e_STATE_YEARINTRO)
+					m_iCurrentState = e_STATE_YEARINTRO;
 				
 				m_tBlackScrn.alpha = m_fFadeInTimer;
 				m_fFadeInTimer -= FlxG.elapsed;
 				
 				super.update();
 				return;
+			}
+			
+			if (m_iCurrentState == e_STATE_YEARMID)
+			{
+				// Need to show progress through year
+				m_fFadeThroughTimer += FlxG.elapsed;
+				
+				if(m_fFadeThroughTimer < 1.0)
+					m_tBlackScrn.alpha = m_fFadeThroughTimer;
+				else if (m_fFadeThroughTimer < 2.0)
+					m_tBlackScrn.alpha = 2.0 - m_fFadeThroughTimer;
+				else
+				{
+					m_fFadeThroughTimer = 0;
+					m_tBlackScrn.alpha = 0;
+					m_iCurrentState = e_STATE_YEAREND;
+				}
 			}
 			
 			super.update();
@@ -113,7 +137,27 @@ package states
 		
 		private function processInput():void
 		{
-			if (m_iCurrentState == e_STATE_YEARSTART)
+			if (m_iCurrentState == e_STATE_YEARINTRO)
+			{
+				if (m_tDialogBox.getIsActive())
+				{
+					if (FlxG.keys.justPressed("ONE"))
+					{
+						m_tDialogBox.setIsActive(false);
+						m_iCurrentState = e_STATE_YEARSTART;
+					}
+				}
+				else
+				{
+					m_tDialogBox.setIsActive(true);
+					
+					m_tDialogBox.setText(XmlData.m_aYearStartText[m_iCurrentYear] + "\n\n-Mr. Advisor");
+					
+					m_tInstructions.text = "1 - Continue";
+					m_tInstructionsShadow.text = "1 - Continue";
+				}
+			}
+			else if (m_iCurrentState == e_STATE_YEARSTART)
 			{
 				if (m_tParticipantList.getIsActive())
 				{
@@ -130,13 +174,52 @@ package states
 						// Toggle an assessment option for current entry
 						m_tParticipantList.toggleAssessment();
 					}
+					if (FlxG.keys.justPressed("THREE"))
+					{
+						// Confirm
+						m_tParticipantList.setIsActive(false);
+						m_iCurrentState = e_STATE_YEARMID;
+						
+						m_tInstructions.text = "";
+						m_tInstructionsShadow.text = "";
+					}
 				}
 				else
 				{
 					m_tParticipantList.setIsActive(true);
+					var iYearsToGo:int = 5 - m_iCurrentYear;
+					m_tParticipantList.setYearText(iYearsToGo.toString() + " years remain");
 					
 					m_tInstructions.text = "1 - Toggle assessment, 2 - Toggle training, 3 - Confirm plans";
 					m_tInstructionsShadow.text = "1 - Toggle assessment, 2 - Toggle training, 3 - Confirm plans";
+				}
+			}
+			else if (m_iCurrentState == e_STATE_YEAREND)
+			{
+				if (m_tParticipantList.getIsActive())
+				{
+					if (FlxG.keys.justPressed("UP"))
+					{
+						m_tParticipantList.moveSelectionUp();
+					}
+					else if (FlxG.keys.justPressed("DOWN"))
+					{
+						m_tParticipantList.moveSelectionDown();
+					}
+					if (FlxG.keys.justPressed("ONE"))
+					{
+						// Toggle an assessment option for current entry
+						m_tParticipantList.toggleView();
+					}
+				}
+				else
+				{
+					m_tParticipantList.setIsActive(true);
+					var iThisYear:int = m_iCurrentYear + 1;
+					m_tParticipantList.setYearText("End of Year " + iThisYear.toString() + " Report");
+					
+					m_tInstructions.text = "1 - Toggle skill view, 2 - Begin elimination";
+					m_tInstructionsShadow.text = "1 - Toggle skill view, 2 - Begin elimination";
 				}
 			}
 		}

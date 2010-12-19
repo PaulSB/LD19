@@ -11,6 +11,22 @@
 		<Forename>Sam</Forename>
 		<Forename>Victor</Forename>
 		<Forename>Wayne</Forename>
+		<Forename>Pontius</Forename>
+		<Forename>Ptolemy</Forename>
+		<Forename>Bason</Forename>
+		<Forename>Karlos</Forename>
+		<Forename>Buck</Forename>
+		<Forename>Bobslent</Forename>
+		<Forename>Gin</Forename>
+		<Forename>Sponford</Forename>
+		<Forename>Cheddar</Forename>
+		<Forename>Shoup</Forename>
+		<Forename>Ivankor</Forename>
+		<Forename>Turbo</Forename>
+		<Forename>Tront</Forename>
+		<Forename>Alibut</Forename>
+		<Forename>Spent</Forename>
+		<Forename>Viktor</Forename>
 		
 		<Surname>Abraham</Surname>
 		<Surname>Benedict</Surname>
@@ -22,5 +38,28 @@
 		<Surname>Hardy</Surname>
 		<Surname>Jeffries</Surname>
 		<Surname>King</Surname>
+		<Surname>Funter</Surname>
+		<Surname>Bartleby</Surname>
+		<Surname>Stopcock</Surname>
+		<Surname>Arnus</Surname>
+		<Surname>Stark</Surname>
+		<Surname>Strange</Surname>
+		<Surname>Runty</Surname>
+		<Surname>Boozer</Surname>
+		<Surname>Denton</Surname>
+		<Surname>Horboken</Surname>
+		<Surname>Potato</Surname>
+		<Surname>Sandbag</Surname>
+		<Surname>Warwhale</Surname>
+		<Surname>Danson</Surname>
 	</Names>
+	
+	<YearStartText>
+		<Text>Placeholder Year 1 tip text!</Text>
+		<Text>Placeholder Year 2 tip text!</Text>
+		<Text>Placeholder Year 3 tip text!</Text>
+		<Text>Placeholder Year 4 tip text!</Text>
+		<Text>Placeholder Year 5 tip text!</Text>
+		<Text>Placeholder Demon Lord tip text! Good luck!</Text>
+	</YearStartText>
 </data>

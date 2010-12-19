@@ -14,11 +14,13 @@ package
 		
 		static public var m_aForenames:Array;
 		static public var m_aSurnames:Array;
+		static public var m_aYearStartText:Array;
 		
 		public function XmlData() 
 		{
 			m_aForenames = new Array;
 			m_aSurnames = new Array;
+			m_aYearStartText = new Array;
 			
 			var xmlLoader:URLLoader = new URLLoader(new URLRequest("../data/xml/data.xml"));
 			xmlLoader.addEventListener(Event.COMPLETE, processXML);
@@ -35,6 +37,11 @@ package
 				
 				iNameIndex = FlxU.random() * m_tXmlData.Names.Surname.length();
 				m_aSurnames.push(m_tXmlData.Names.Surname[iNameIndex]);
+			}
+			
+			for (i = 0; i < m_tXmlData.YearStartText.Text.length(); i++)
+			{
+				m_aYearStartText.push(m_tXmlData.YearStartText.Text[i]);
 			}
 		}
 	}
