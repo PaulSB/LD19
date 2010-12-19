@@ -26,7 +26,7 @@ package ui
 			m_tBackingBox.loadGraphic(imgBackingBox);
 			m_tBackingBox.x = (FlxG.width - m_tBackingBox.width) * 0.5;
 			
-			m_tText = new FlxText(m_tBackingBox.x, 120, m_tBackingBox.width -16);
+			m_tText = new FlxText(m_tBackingBox.x + 8, 120, m_tBackingBox.width -16);
 			m_tText.setFormat("Istria", 32, 0xff2d1601, "center");
 			
 			m_aGraphics = new FlxGroup;

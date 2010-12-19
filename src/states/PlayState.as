@@ -22,7 +22,8 @@ package states
 		private const e_STATE_YEARSTART:int = 1;
 		private const e_STATE_YEARMID:int = 2;		// Non-interactive state where the year's activities just "happen"
 		private const e_STATE_YEAREND:int = 3;
-		private const e_STATE_ELIMINATION:int = 4;	
+		private const e_STATE_ELIMINATION:int = 4;
+		private const e_STATE_ENDGAME:int = 5;
 			
 		// Render layers:
 		static private var s_layerBackground:FlxGroup;
@@ -80,7 +81,12 @@ package states
 			s_layerBackground.add(m_tBG);
 			
 			s_layerObjects = new FlxGroup;
-			s_layerObjects.add(m_aParticipants);
+			for (i = 0; i < m_aParticipants.members.length; i++)
+			{
+				s_layerObjects.add(m_aParticipants.members[i]);
+				s_layerObjects.add(m_aParticipants.members[i].m_tTrainingImg1);
+				s_layerObjects.add(m_aParticipants.members[i].m_tTrainingImg2);
+			}
 			
 			s_layerForeground = new FlxGroup;
 			s_layerForeground.add(m_tParticipantList.m_aGraphics);
@@ -145,7 +151,14 @@ package states
 					if (FlxG.keys.justPressed("ONE"))
 					{
 						m_tDialogBox.setIsActive(false);
-						m_iCurrentState = e_STATE_YEARSTART;
+						
+						if (m_iCurrentYear == 5)
+						{
+							// ENDGAME time
+							m_iCurrentState = e_STATE_ENDGAME
+						}
+						else
+							m_iCurrentState = e_STATE_YEARSTART;
 					}
 				}
 				else
@@ -175,6 +188,11 @@ package states
 						// Toggle an assessment option for current entry
 						m_tParticipantList.toggleAssessment();
 					}
+					if (FlxG.keys.justPressed("TWO"))
+					{
+						// Toggle a training option for current entry
+						m_tParticipantList.toggleTraining();
+					}
 					if (FlxG.keys.justPressed("THREE"))
 					{
 						// Confirm
@@ -196,7 +214,10 @@ package states
 					
 					m_tParticipantList.setIsActive(true);
 					var iYearsToGo:int = 5 - m_iCurrentYear;
-					m_tParticipantList.setYearText(iYearsToGo.toString() + " years remain");
+					if (iYearsToGo == 1)
+						m_tParticipantList.setYearText(iYearsToGo.toString() + " year remains");
+					else
+						m_tParticipantList.setYearText(iYearsToGo.toString() + " years remain");
 					
 					m_tInstructions.text = "1 - Toggle assessment, 2 - Toggle training, 3 - Confirm plans";
 					m_tInstructionsShadow.text = "1 - Toggle assessment, 2 - Toggle training, 3 - Confirm plans";
@@ -267,6 +288,21 @@ package states
 								iCount++;
 						}
 						
+						if (m_iCurrentYear == 5 && iCount == 5)
+						{
+							// ELIMINATE! - final five special case
+							for (i = 0; i < m_aParticipants.members.length; i++)
+							{
+								if (m_aParticipants.members[i].m_bEliminate)
+								{
+									m_aParticipants.members[i].exists = false;
+									m_aParticipants.members.splice(i--, 1);
+								}
+							}
+							
+							m_tParticipantList.setIsActive(false);
+							m_iCurrentState = e_STATE_YEARINTRO;
+						}
 						if (iCount == 10)
 						{
 							// ELIMINATE!
@@ -294,7 +330,10 @@ package states
 					}
 					
 					m_tParticipantList.setIsActive(true);
-					m_tParticipantList.setYearText("Select the 10 participants to eliminate");
+					if (m_iCurrentYear == 5)
+						m_tParticipantList.setYearText("Select the 5 participants to eliminate");
+					else
+						m_tParticipantList.setYearText("Select the 10 participants to eliminate");
 					
 					m_tInstructions.text = "1 - Toggle skill view, 2 - Toggle elimination, 3 - Confirm choices";
 					m_tInstructionsShadow.text = "1 - Toggle skill view, 2 - Toggle elimination, 3 - Confirm choices";
@@ -319,6 +358,83 @@ package states
 					pThisGuy.m_bRevealRanged = true;
 				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
 					pThisGuy.m_bRevealMagic = true;
+				else if (pThisGuy.m_tTrainingImg2.exists)
+				{
+					// Already fully trained! - BAIL
+				}
+				else if (pThisGuy.m_iThisYearTraining == pThisGuy.m_iTraining1)
+				{
+					// Can't train same discipline twice! - BAIL
+				}
+				else 
+				{
+					if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_DEFEND)
+					{
+						pThisGuy.m_bTrainedDefend = true;
+						if (!pThisGuy.m_tTrainingImg1.exists)
+						{
+							pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_DEFEND;
+							pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgDefend);
+							pThisGuy.m_tTrainingImg1.exists = true;
+						}
+						else
+						{
+							pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_DEFEND;
+							pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgDefend);
+							pThisGuy.m_tTrainingImg2.exists = true;
+						}
+					}
+					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_MELEE)
+					{
+						pThisGuy.m_bTrainedMelee = true;
+						if (!pThisGuy.m_tTrainingImg1.exists)
+						{
+							pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_MELEE;
+							pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgMelee);
+							pThisGuy.m_tTrainingImg1.exists = true;
+						}
+						else
+						{
+							pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_MELEE;
+							pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgMelee);
+							pThisGuy.m_tTrainingImg2.exists = true;
+						}
+					}
+					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_RANGED)
+					{
+						pThisGuy.m_bTrainedRanged = true;
+						if (!pThisGuy.m_tTrainingImg1.exists)
+						{
+							pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_RANGED;
+							pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgRanged);
+							pThisGuy.m_tTrainingImg1.exists = true;
+						}
+						else
+						{
+							pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_RANGED;
+							pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgRanged);
+							pThisGuy.m_tTrainingImg2.exists = true;
+						}
+					}
+					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_MAGIC)
+					{
+						pThisGuy.m_bTrainedMagic = true;
+						if (!pThisGuy.m_tTrainingImg1.exists)
+						{
+							pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_MAGIC;
+							pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgMagic);
+							pThisGuy.m_tTrainingImg1.exists = true;
+						}
+						else
+						{
+							pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_MAGIC;
+							pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgMagic);
+							pThisGuy.m_tTrainingImg2.exists = true;
+						}
+					}
+				}
+				
+				pThisGuy.setClassRating();	// Update class score
 			}
 		}
 	}
