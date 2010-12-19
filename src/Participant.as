@@ -12,6 +12,17 @@ package
 	{
 		[Embed(source = '../data/characters/participant.png')] public var imgParticipant:Class;
 		
+		// Constants:
+		public const e_SKILL_DO_NOTHING:int = 0;
+		public const e_SKILL_ASSESS_DEFEND:int = 1;
+		public const e_SKILL_ASSESS_MELEE:int = 2;
+		public const e_SKILL_ASSESS_RANGED:int = 3;
+		public const e_SKILL_ASSESS_MAGIC:int = 4;
+		public const e_SKILL_TRAIN_DEFEND:int = 5;
+		public const e_SKILL_TRAIN_MELEE:int = 6;
+		public const e_SKILL_TRAIN_RANGED:int = 7;
+		public const e_SKILL_TRAIN_MAGIC:int = 8;
+		
 		public var m_sForename:String;
 		public var m_sSurname:String;
 		
@@ -28,6 +39,8 @@ package
 		public var m_iCurrentMagic:int;
 		public var m_iCurrentOverall:int;
 		
+		public var m_iThisYearTraining:int;
+		
 		public function Participant(fYPos:Number) 
 		{
 			super(0, fYPos);
@@ -39,10 +52,10 @@ package
 			m_sForename = "Sanjiv";
 			m_sSurname = "Lal";
 			
-			m_iPotentialDefend = 50;
-			m_iPotentialMelee = 50;
-			m_iPotentialRanged = 50;
-			m_iPotentialMagic = 50;
+			m_iPotentialDefend = 100 * FlxU.random();
+			m_iPotentialMelee = 100 * FlxU.random();
+			m_iPotentialRanged = 100 * FlxU.random();
+			m_iPotentialMagic = 100 * FlxU.random();
 			m_iPotentialOverall = (m_iPotentialDefend + m_iPotentialMelee + m_iPotentialRanged + m_iPotentialMagic) / 4;
 			
 			m_iCurrentDefend = m_iPotentialDefend * 0.2;

@@ -16,6 +16,12 @@ package ui
 		[Embed(source = '../../data/ui/arrow_up.png')] private var imgArrowUp:Class;
 		[Embed(source = '../../data/ui/arrow_down.png')] private var imgArrowDown:Class;
 		
+		[Embed(source = '../../data/ui/skill_none.png')] private var imgSkillNone:Class;
+		[Embed(source = '../../data/ui/skill_defend.png')] private var imgSkillDefend:Class;
+		[Embed(source = '../../data/ui/skill_melee.png')] private var imgSkillMelee:Class;
+		[Embed(source = '../../data/ui/skill_ranged.png')] private var imgSkillRanged:Class;
+		[Embed(source = '../../data/ui/skill_magic.png')] private var imgSkillMagic:Class;
+		
 		private const k_iNumEntriesOnScreen:int = 10;
 		
 		public var m_aGraphics:FlxGroup;
@@ -25,10 +31,13 @@ package ui
 		private var m_tArrowUp:FlxSprite;
 		private var m_tArrowDown:FlxSprite;
 		private var m_tSelectArrow:FlxSprite;
+		private var m_tYearText:FlxText;
 		private var m_aParticipantSprites:FlxGroup;
 		private var m_aIndexText:FlxGroup;
 		private var m_aNameText:FlxGroup;
 		private var m_aStatText:FlxGroup;
+		private var m_aSkillImages:FlxGroup;
+		private var m_aSkillText:FlxGroup;
 		
 		private var m_bActive:Boolean = false;
 		private var m_aCurrentParticipants:FlxGroup;
@@ -63,12 +72,19 @@ package ui
 			m_tSelectArrow = new FlxSprite(m_aBackingBoxes.members[0].x + m_aBackingBoxes.members[0].width, m_aBackingBoxes.members[0].y);
 			m_tSelectArrow.loadGraphic(imgArrowSelect);
 			
+			var iYearsToGo:int = 5 - PlayState.m_iCurrentYear;
+			m_tYearText = new FlxText(0, 5, FlxG.width, iYearsToGo.toString() + " years remain");
+			m_tYearText.setFormat("Istria", 32, 0xfff2f2f2, "center");
+			
 			// First time build list
 			populateList();
 			
 			m_aGraphics = new FlxGroup;
 			m_aGraphics.add(m_aBackingBoxes);
 			m_aGraphics.add(m_aParticipantSprites);
+			m_aGraphics.add(m_aSkillImages);
+			m_aGraphics.add(m_aSkillText);
+			m_aGraphics.add(m_tYearText);
 			m_aGraphics.add(m_aIndexText);
 			m_aGraphics.add(m_aNameText);
 			m_aGraphics.add(m_aStatText);
@@ -88,6 +104,8 @@ package ui
 			m_aIndexText = new FlxGroup;
 			m_aNameText = new FlxGroup;
 			m_aStatText = new FlxGroup;
+			m_aSkillImages = new FlxGroup;
+			m_aSkillText = new FlxGroup;
 			for (var j:int = 0; j < k_iNumEntriesOnScreen; j++)
 			{
 				var pThisBox:FlxSprite = m_aBackingBoxes.members[j];
@@ -108,10 +126,20 @@ package ui
 				m_aNameText.add(tNames);
 				
 				// Showing overall ability
-				var tStat:FlxText = new FlxText(FlxG.width * 0.5, tText.y, FlxG.width * 0.5,
-												"Overall ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall));
+				var tStat:FlxText = new FlxText(FlxG.width * 0.5 - 30, tText.y, FlxG.width * 0.5,
+												"Overall skill:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall));
 				tStat.setFormat("Istria", 20, 0xff2d1601, "left");
 				m_aStatText.add(tStat);
+				
+				pThisGuy.m_iThisYearTraining = pThisGuy.e_SKILL_DO_NOTHING;
+				var tSkillSprite:FlxSprite = new FlxSprite(pThisBox.x + pThisBox.width -8, pThisBox.y);
+				tSkillSprite.loadGraphic(imgSkillNone);
+				tSkillSprite.x -= tSkillSprite.width;
+				m_aSkillImages.add(tSkillSprite);
+				
+				var tSkillText:FlxText = new FlxText(tSkillSprite.x - 20, tText.y, 100, "");
+				tSkillText.setFormat("Istria", 12, 0xff2d1601, "left");
+				m_aSkillText.add(tSkillText);
 			}
 			
 			m_tArrowUp.color = (m_iCurrentIndex == 0) ? 0x797979 : 0xffffff;
@@ -135,7 +163,27 @@ package ui
 				
 				m_aNameText.members[j].text = pThisGuy.m_sForename + " " + pThisGuy.m_sSurname;
 				
-				m_aStatText.members[j].text = "Overall ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall);
+				m_aStatText.members[j].text = "Overall skill:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall);
+				
+				if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_DO_NOTHING)
+					m_aSkillImages.members[j].loadGraphic(imgSkillNone);
+				else if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
+					m_aSkillImages.members[j].loadGraphic(imgSkillDefend);
+				else if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
+					m_aSkillImages.members[j].loadGraphic(imgSkillMelee);
+				else if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
+					m_aSkillImages.members[j].loadGraphic(imgSkillRanged);
+				else if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
+					m_aSkillImages.members[j].loadGraphic(imgSkillMagic);
+					
+				if (pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_ASSESS_DEFEND
+					&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_ASSESS_MAGIC)
+					m_aSkillText.members[j].text = "ASSESS";
+				else if(pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_TRAIN_DEFEND
+					&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_TRAIN_MAGIC)
+					m_aSkillText.members[j].text = "TRAIN";
+				else
+					m_aSkillText.members[j].text = "";
 			}
 			
 			m_tArrowUp.color = (m_iCurrentIndex == 0) ? 0x797979 : 0xffffff;
@@ -163,6 +211,8 @@ package ui
 			else if (m_iCurrentIndex > 0)
 			{
 				m_iCurrentIndex--;
+				m_iCurrentSelection--;
+				m_tSelectArrow.y = m_aBackingBoxes.members[m_iCurrentSelection - m_iCurrentIndex].y;
 				rePopulateList();
 			}
 		}
@@ -177,8 +227,45 @@ package ui
 			else if (m_iCurrentIndex + k_iNumEntriesOnScreen < PlayState.m_aParticipants.members.length)
 			{
 				m_iCurrentIndex++;
+				m_iCurrentSelection++;
+				m_tSelectArrow.y = m_aBackingBoxes.members[m_iCurrentSelection - m_iCurrentIndex].y;
 				rePopulateList();
 			}
+		}
+		
+		public function toggleAssessment():void
+		{
+			var pThisGuy:Participant = PlayState.m_aParticipants.members[m_iCurrentSelection];
+			if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_DO_NOTHING
+				|| pThisGuy.m_iThisYearTraining > pThisGuy.e_SKILL_ASSESS_MAGIC)
+				pThisGuy.m_iThisYearTraining = pThisGuy.e_SKILL_ASSESS_DEFEND;
+			else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
+				pThisGuy.m_iThisYearTraining = pThisGuy.e_SKILL_DO_NOTHING
+			else
+				pThisGuy.m_iThisYearTraining++;
+				
+			// Change image...
+			var iIndex:int = m_iCurrentSelection - m_iCurrentIndex;
+			if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_DO_NOTHING)
+				m_aSkillImages.members[iIndex].loadGraphic(imgSkillNone);
+			else if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
+				m_aSkillImages.members[iIndex].loadGraphic(imgSkillDefend);
+			else if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
+				m_aSkillImages.members[iIndex].loadGraphic(imgSkillMelee);
+			else if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
+				m_aSkillImages.members[iIndex].loadGraphic(imgSkillRanged);
+			else if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
+				m_aSkillImages.members[iIndex].loadGraphic(imgSkillMagic);
+				
+			// Change text...
+			if (pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_ASSESS_DEFEND
+				&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_ASSESS_MAGIC)
+				m_aSkillText.members[iIndex].text = "ASSESS";
+			else if(pThisGuy.m_iThisYearTraining >= pThisGuy.e_SKILL_TRAIN_DEFEND
+				&& pThisGuy.m_iThisYearTraining <= pThisGuy.e_SKILL_TRAIN_MAGIC)
+				m_aSkillText.members[iIndex].text = "TRAIN";
+			else
+				m_aSkillText.members[iIndex].text = "";
 		}
 	}
 }

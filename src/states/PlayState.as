@@ -15,6 +15,11 @@ package states
 	{
 		[Embed(source = '../../data/world/bg.png')] private var imgBG:Class;
 		[Embed(source = '../../data/ui/black.png')] private var imgBlack:Class;
+		
+		// Constants
+		//private const e_STATE_HUB:int = 0;
+		//private const e_STATE_VIEWLIST:int = 1;
+		private const e_STATE_YEARSTART:int = 2;
 			
 		// Render layers:
 		static private var s_layerBackground:FlxGroup;
@@ -23,6 +28,7 @@ package states
 		static private var s_layerOverlay:FlxGroup;
 		
 		static public var m_aParticipants:FlxGroup;
+		static public var m_iCurrentYear:int = 0;		// Start by advancing to year 1. 5 is last year. 6 represents endgame.
 		private var m_tBG:FlxSprite;
 		private var m_tBlackScrn:FlxSprite;
 		private var m_tParticipantList:ViewParticipants;
@@ -32,6 +38,8 @@ package states
 		
 		private var m_fFadeInTimer:Number = 1.0;
 		private var m_iNumParticipants:int = 50;
+		//private var m_bAdvanceYear:Boolean = false;	// True when in the year-start period of setting up
+		private var m_iCurrentState:int = e_STATE_YEARSTART;
 		
 		override public function create():void
 		{
@@ -54,9 +62,9 @@ package states
 			m_tParticipantList = new ViewParticipants;
 			
 			// Instruction text
-			m_tInstructions = new FlxText(0, FlxG.height -32, FlxG.width, "1 - View participants");
+			m_tInstructions = new FlxText(0, FlxG.height -32, FlxG.width, "");
 			m_tInstructions.setFormat("Istria", 20, 0xfff2f2f2, "center");
-			m_tInstructionsShadow = new FlxText(0, FlxG.height -32 +2, FlxG.width +2, "1 - View participants");
+			m_tInstructionsShadow = new FlxText(0, FlxG.height -32 +2, FlxG.width +2, "");
 			m_tInstructionsShadow.setFormat("Istria", 20, 0xff000000, "center");
 			
 			m_tBlackScrn = new FlxSprite;
@@ -90,6 +98,9 @@ package states
 			
 			if (m_fFadeInTimer > 0)
 			{
+				if (m_iCurrentState != e_STATE_YEARSTART)
+					m_iCurrentState = e_STATE_YEARSTART;
+				
 				m_tBlackScrn.alpha = m_fFadeInTimer;
 				m_fFadeInTimer -= FlxG.elapsed;
 				
@@ -104,7 +115,33 @@ package states
 		
 		private function processInput():void
 		{
-			if (m_tParticipantList.getIsActive())
+			if (m_iCurrentState == e_STATE_YEARSTART)
+			{
+				if (m_tParticipantList.getIsActive())
+				{
+					if (FlxG.keys.justPressed("UP"))
+					{
+						m_tParticipantList.moveSelectionUp();
+					}
+					else if (FlxG.keys.justPressed("DOWN"))
+					{
+						m_tParticipantList.moveSelectionDown();
+					}
+					if (FlxG.keys.justPressed("ONE"))
+					{
+						// Toggle an assessment option for current entry
+						m_tParticipantList.toggleAssessment();
+					}
+				}
+				else
+				{
+					m_tParticipantList.setIsActive(true);
+					
+					m_tInstructions.text = "1 - Toggle assessment, 2 - Toggle training, 3 - Confirm plans";
+					m_tInstructionsShadow.text = "1 - Toggle assessment, 2 - Toggle training, 3 - Confirm plans";
+				}
+			}
+			/*else if (m_tParticipantList.getIsActive())
 			{
 				// Participant list view
 				
@@ -135,7 +172,7 @@ package states
 					m_tInstructions.text = "1 - Hide participants";
 					m_tInstructionsShadow.text = "1 - Hide participants";
 				}
-			}
+			}*/
 		}
 	}
 }

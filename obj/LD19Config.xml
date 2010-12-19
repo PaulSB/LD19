@@ -14,7 +14,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'18/12/2010'</value>
+      <value>'19/12/2010'</value>
     </define>
     <source-path append="true">
       <path-element>G:\Work\Compo\Ludum Dare 19\LD19\src</path-element>

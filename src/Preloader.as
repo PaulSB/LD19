@@ -14,7 +14,7 @@ package
 			super();
 			
 			// Force at least this much preloader
-			minDisplayTime = 3;
+			//minDisplayTime = 3;
 		}
 	}
 }

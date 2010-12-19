@@ -42,7 +42,7 @@ package states
 		
 		override public function update():void
 		{
-			if (FlxG.keys.justPressed("SPACE"))
+			if (FlxG.keys.justPressed("ONE"))
 			{
 				FlxG.fade.start(0xff000000, 0.5, onFade);
 			}            
