@@ -17,9 +17,7 @@ package states
 		[Embed(source = '../../data/ui/black.png')] private var imgBlack:Class;
 		
 		// Constants
-		//private const e_STATE_HUB:int = 0;
-		//private const e_STATE_VIEWLIST:int = 1;
-		private const e_STATE_YEARSTART:int = 2;
+		private const e_STATE_YEARSTART:int = 0;
 			
 		// Render layers:
 		static private var s_layerBackground:FlxGroup;
@@ -38,7 +36,7 @@ package states
 		
 		private var m_fFadeInTimer:Number = 1.0;
 		private var m_iNumParticipants:int = 50;
-		//private var m_bAdvanceYear:Boolean = false;	// True when in the year-start period of setting up
+
 		private var m_iCurrentState:int = e_STATE_YEARSTART;
 		
 		override public function create():void
@@ -141,38 +139,6 @@ package states
 					m_tInstructionsShadow.text = "1 - Toggle assessment, 2 - Toggle training, 3 - Confirm plans";
 				}
 			}
-			/*else if (m_tParticipantList.getIsActive())
-			{
-				// Participant list view
-				
-				if (FlxG.keys.justPressed("ONE"))
-				{
-					m_tParticipantList.setIsActive(false);
-					
-					m_tInstructions.text = "1 - Show participants";
-					m_tInstructionsShadow.text = "1 - Show participants";
-				}
-				else if (FlxG.keys.justPressed("UP"))
-				{
-					m_tParticipantList.moveSelectionUp();
-				}
-				else if (FlxG.keys.justPressed("DOWN"))
-				{
-					m_tParticipantList.moveSelectionDown();
-				}
-			}
-			else
-			{
-				// Standard (hub) view
-				
-				if (FlxG.keys.justPressed("ONE"))
-				{
-					m_tParticipantList.setIsActive(true);
-					
-					m_tInstructions.text = "1 - Hide participants";
-					m_tInstructionsShadow.text = "1 - Hide participants";
-				}
-			}*/
 		}
 	}
 }

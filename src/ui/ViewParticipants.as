@@ -126,9 +126,9 @@ package ui
 				m_aNameText.add(tNames);
 				
 				// Showing overall ability
-				var tStat:FlxText = new FlxText(FlxG.width * 0.5 - 30, tText.y, FlxG.width * 0.5,
-												"Overall skill:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall));
-				tStat.setFormat("Istria", 20, 0xff2d1601, "left");
+				var tStat:FlxText = new FlxText(FlxG.width * 0.5, tText.y + 4, FlxG.width * 0.5,
+												"Overall ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall));
+				tStat.setFormat("Istria", 16, 0xff2d1601, "left");
 				m_aStatText.add(tStat);
 				
 				pThisGuy.m_iThisYearTraining = pThisGuy.e_SKILL_DO_NOTHING;
@@ -163,7 +163,7 @@ package ui
 				
 				m_aNameText.members[j].text = pThisGuy.m_sForename + " " + pThisGuy.m_sSurname;
 				
-				m_aStatText.members[j].text = "Overall skill:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall);
+				m_aStatText.members[j].text = "Overall ability:  " + pThisGuy.GetRatingStr(pThisGuy.m_iCurrentOverall);
 				
 				if(pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_DO_NOTHING)
 					m_aSkillImages.members[j].loadGraphic(imgSkillNone);

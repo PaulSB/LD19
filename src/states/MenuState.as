@@ -16,6 +16,9 @@ package states
 		{
 			bgColor = 0xff797979;
 			
+			// Read XML data
+			new XmlData();
+			
 			// Title text
 			var tTxt:FlxText;
 			tTxt = new FlxText(0, 40, FlxG.width,

@@ -48,9 +48,9 @@ package
 			
 			x = FlxU.random() * (FlxG.width - width);
 			
-			// Set attributes: TO DO: REPLACE HARCODED CRAP!
-			m_sForename = "Sanjiv";
-			m_sSurname = "Lal";
+			// Set attributes:		
+			m_sForename = XmlData.m_aForenames.shift();
+			m_sSurname = XmlData.m_aSurnames.shift();
 			
 			m_iPotentialDefend = 100 * FlxU.random();
 			m_iPotentialMelee = 100 * FlxU.random();
@@ -58,6 +58,7 @@ package
 			m_iPotentialMagic = 100 * FlxU.random();
 			m_iPotentialOverall = (m_iPotentialDefend + m_iPotentialMelee + m_iPotentialRanged + m_iPotentialMagic) / 4;
 			
+			// Ability as per year 1/5
 			m_iCurrentDefend = m_iPotentialDefend * 0.2;
 			m_iCurrentMelee = m_iPotentialMelee * 0.2;
 			m_iCurrentRanged = m_iPotentialRanged * 0.2;
