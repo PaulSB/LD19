@@ -2,6 +2,7 @@ package states
 {
 	import org.flixel.FlxG;
 	import org.flixel.FlxGroup;
+	import org.flixel.FlxSound;
 	import org.flixel.FlxSprite;
 	import org.flixel.FlxState;
 	import org.flixel.FlxText;
@@ -17,6 +18,9 @@ package states
 	{
 		[Embed(source = '../../data/world/bg.png')] private var imgBG:Class;
 		[Embed(source = '../../data/ui/black.png')] private var imgBlack:Class;
+		[Embed(source='../../data/ui/warning_box.png')] private var imgWarningBox:Class;
+		
+		[Embed(source='../../data/sfx/select.mp3')] private var sfxSelect:Class;
 		
 		// Constants
 		private const e_STATE_YEARINTRO:int = 0;
@@ -41,9 +45,13 @@ package states
 		private var m_tParticipantList:ViewParticipants;
 		private var m_tEndgameView:ViewEndGame;
 		private var m_tDialogBox:DialogBox;
+		private var m_tSFXselect:FlxSound;
 		
 		private var m_tInstructions:FlxText;
 		private var m_tInstructionsShadow:FlxText;
+		private var m_tWarningText:FlxText;
+		private var m_tWarningBacking:FlxSprite;
+		private var m_fWarningTimer:Number = 3.0;
 		
 		private var m_fFadeInTimer:Number = 1.0;
 		private var m_fFadeThroughTimer:Number = 0.0;
@@ -74,8 +82,15 @@ package states
 			// Instruction text
 			m_tInstructions = new FlxText(0, FlxG.height -32, FlxG.width, "");
 			m_tInstructions.setFormat("Istria", 20, 0xfff2f2f2, "center");
-			m_tInstructionsShadow = new FlxText(0, FlxG.height -32 +2, FlxG.width +2, "");
+			m_tInstructionsShadow = new FlxText(0 +2, FlxG.height -32 +2, FlxG.width, "");
 			m_tInstructionsShadow.setFormat("Istria", 20, 0xff000000, "center");
+			
+			m_tWarningText = new FlxText(0, FlxG.height * 0.5 -24, FlxG.width, "");
+			m_tWarningText.setFormat("Istria", 32, 0xff48586d, "center");
+			m_tWarningText.alpha = 0;
+			m_tWarningBacking = new FlxSprite(10, m_tWarningText.y -4);
+			m_tWarningBacking.loadGraphic(imgWarningBox);
+			m_tWarningBacking.alpha = 0;
 			
 			m_tBlackScrn = new FlxSprite;
 			m_tBlackScrn.loadGraphic(imgBlack);
@@ -98,6 +113,8 @@ package states
 			s_layerForeground.add(m_tDialogBox.m_aGraphics);
 			s_layerForeground.add(m_tInstructionsShadow);
 			s_layerForeground.add(m_tInstructions);
+			s_layerForeground.add(m_tWarningBacking);
+			s_layerForeground.add(m_tWarningText);
 			
 			s_layerOverlay = new FlxGroup;
 			s_layerOverlay.add(m_tBlackScrn);
@@ -107,6 +124,10 @@ package states
 			add(s_layerObjects);
 			add(s_layerForeground);
 			add(s_layerOverlay);
+			
+			// SFX
+			m_tSFXselect = new FlxSound;
+			m_tSFXselect.loadEmbedded(sfxSelect);
 		}
 		
 		override public function update():void
@@ -123,6 +144,27 @@ package states
 				
 				super.update();
 				return;
+			}
+			
+			if (m_tWarningText.alpha > 0)
+			{
+				if (m_fWarningTimer > 0)
+				{
+					m_fWarningTimer -= FlxG.elapsed;
+				}
+				else
+				{
+					m_fWarningTimer = 0;
+					
+					m_tWarningText.alpha -= FlxG.elapsed;
+					m_tWarningBacking.alpha -= FlxG.elapsed;
+					if (m_tWarningText.alpha <= 0)
+					{
+						m_tWarningText.alpha = 0;
+						m_tWarningBacking.alpha = 0;
+						m_fWarningTimer = 3.0;
+					}
+				}
 			}
 			
 			if (m_iCurrentState == e_STATE_YEARMID)
@@ -155,6 +197,8 @@ package states
 				{
 					if (FlxG.keys.justPressed("ONE"))
 					{
+						m_tSFXselect.play();
+						
 						m_tDialogBox.setIsActive(false);
 						
 						if (m_iCurrentYear == 5)
@@ -200,6 +244,8 @@ package states
 					}
 					if (FlxG.keys.justPressed("THREE"))
 					{
+						m_tSFXselect.play();
+						
 						// Confirm
 						m_tParticipantList.setIsActive(false);
 						m_iCurrentState = e_STATE_YEARMID;
@@ -247,6 +293,8 @@ package states
 					}
 					if (FlxG.keys.justPressed("TWO"))
 					{
+						m_tSFXselect.play();
+						
 						m_tParticipantList.setIsActive(false);
 						m_iCurrentState = e_STATE_ELIMINATION;
 					}
@@ -286,6 +334,8 @@ package states
 					}
 					else if (FlxG.keys.justPressed("THREE"))
 					{
+						m_tSFXselect.play();
+						
 						var iCount:int = 0;
 						for (var i:int = 0; i < m_aParticipants.members.length; i++)
 						{
@@ -293,39 +343,55 @@ package states
 								iCount++;
 						}
 						
-						if (m_iCurrentYear == 5 && iCount == 5)
+						if (m_iCurrentYear == 5)
 						{
-							// ELIMINATE! - final five special case
-							for (i = 0; i < m_aParticipants.members.length; i++)
+							if (iCount == 5)
 							{
-								if (m_aParticipants.members[i].m_bEliminate)
+								// ELIMINATE! - final five special case
+								for (i = 0; i < m_aParticipants.members.length; i++)
 								{
-									m_aParticipants.members[i].exists = false;
-									m_aParticipants.members[i].m_tTrainingImg1.exists = false;
-									m_aParticipants.members[i].m_tTrainingImg2.exists = false;
-									m_aParticipants.members.splice(i--, 1);
+									if (m_aParticipants.members[i].m_bEliminate)
+									{
+										m_aParticipants.members[i].exists = false;
+										m_aParticipants.members[i].m_tTrainingImg1.exists = false;
+										m_aParticipants.members[i].m_tTrainingImg2.exists = false;
+										m_aParticipants.members.splice(i--, 1);
+									}
 								}
+								
+								m_tParticipantList.setIsActive(false);
+								m_iCurrentState = e_STATE_YEARINTRO;
 							}
-							
-							m_tParticipantList.setIsActive(false);
-							m_iCurrentState = e_STATE_YEARINTRO;
+							else
+							{
+								m_tWarningText.text = "You have selected " + iCount.toString() + " participants. Please select 5.";
+								m_tWarningText.alpha = m_tWarningBacking.alpha = 1.0;
+							}
 						}
-						if (iCount == 10)
+						else
 						{
-							// ELIMINATE!
-							for (i = 0; i < m_aParticipants.members.length; i++)
+							if (iCount == 10)
 							{
-								if (m_aParticipants.members[i].m_bEliminate)
+								// ELIMINATE!
+								for (i = 0; i < m_aParticipants.members.length; i++)
 								{
-									m_aParticipants.members[i].exists = false;
-									m_aParticipants.members[i].m_tTrainingImg1.exists = false;
-									m_aParticipants.members[i].m_tTrainingImg2.exists = false;
-									m_aParticipants.members.splice(i--, 1);
+									if (m_aParticipants.members[i].m_bEliminate)
+									{
+										m_aParticipants.members[i].exists = false;
+										m_aParticipants.members[i].m_tTrainingImg1.exists = false;
+										m_aParticipants.members[i].m_tTrainingImg2.exists = false;
+										m_aParticipants.members.splice(i--, 1);
+									}
 								}
+								
+								m_tParticipantList.setIsActive(false);
+								m_iCurrentState = e_STATE_YEARINTRO;
 							}
-							
-							m_tParticipantList.setIsActive(false);
-							m_iCurrentState = e_STATE_YEARINTRO;
+							else 
+							{
+								m_tWarningText.text = "You have selected " + iCount.toString() + " participants. Please select 10.";
+								m_tWarningText.alpha = m_tWarningBacking.alpha = 1.0;
+							}
 						}
 					}
 				}
@@ -354,6 +420,8 @@ package states
 				{
 					if (FlxG.keys.justPressed("ONE"))
 					{
+						m_tSFXselect.play();
+						
 						m_tEndgameView.setIsActive(false);
 						m_iCurrentState = e_STATE_ENDGAME2;
 					}
@@ -376,6 +444,8 @@ package states
 				{
 					if (FlxG.keys.justPressed("ONE"))
 					{
+						m_tSFXselect.play();
+						
 						m_tEndgameView.setIsActive(false);
 						m_iCurrentState = e_STATE_ENDGAME3;
 					}
@@ -395,6 +465,8 @@ package states
 				{
 					if (FlxG.keys.justPressed("ONE"))
 					{
+						m_tSFXselect.play();
+						
 						m_tEndgameView.setIsActive(false);
 						m_iCurrentState = e_STATE_YEARINTRO;
 						m_iCurrentYear = 0;

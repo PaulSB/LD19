@@ -34,7 +34,7 @@ package states
 			add(tTxt);
 			
 			// Shadow
-			tTxt = new FlxText(0, FlxG.height -32 +2, FlxG.width +2, "Press 1 to begin");
+			tTxt = new FlxText(0 +2, FlxG.height -32 +2, FlxG.width, "Press 1 to begin");
 			tTxt.setFormat("Istria", 20, 0xff000000, "center");
 			add(tTxt);
 			// Instruction text
