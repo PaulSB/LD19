@@ -174,7 +174,7 @@ package ui
 				var pThisGuy:Participant = m_aFinalFive.members[i];
 				iTotalRating += pThisGuy.m_iCurrentClass;
 				
-				if (!bClasslessChars && !pThisGuy.m_iTraining1 && !pThisGuy.m_iTraining2)
+				if (!bClasslessChars && (!pThisGuy.m_iTraining1 || !pThisGuy.m_iTraining2))
 					bClasslessChars = true;
 			}
 			
