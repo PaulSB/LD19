@@ -6,6 +6,7 @@ package states
 	import org.flixel.FlxState;
 	import org.flixel.FlxText;
 	import ui.DialogBox;
+	import ui.ViewEndGame;
 	import ui.ViewParticipants;
 	/**
 	 * LD19 - "Discovery"
@@ -23,7 +24,9 @@ package states
 		private const e_STATE_YEARMID:int = 2;		// Non-interactive state where the year's activities just "happen"
 		private const e_STATE_YEAREND:int = 3;
 		private const e_STATE_ELIMINATION:int = 4;
-		private const e_STATE_ENDGAME:int = 5;
+		private const e_STATE_ENDGAME1:int = 5;
+		private const e_STATE_ENDGAME2:int = 6;
+		private const e_STATE_ENDGAME3:int = 7;
 			
 		// Render layers:
 		static private var s_layerBackground:FlxGroup;
@@ -36,6 +39,7 @@ package states
 		private var m_tBG:FlxSprite;
 		private var m_tBlackScrn:FlxSprite;
 		private var m_tParticipantList:ViewParticipants;
+		private var m_tEndgameView:ViewEndGame;
 		private var m_tDialogBox:DialogBox;
 		
 		private var m_tInstructions:FlxText;
@@ -43,7 +47,6 @@ package states
 		
 		private var m_fFadeInTimer:Number = 1.0;
 		private var m_fFadeThroughTimer:Number = 0.0;
-		//private var m_iNumParticipants:int = 50;
 
 		private var m_iCurrentState:int = e_STATE_YEARINTRO;
 		
@@ -66,6 +69,7 @@ package states
 			// UI overlays
 			m_tParticipantList = new ViewParticipants;
 			m_tDialogBox = new DialogBox;
+			m_tEndgameView = new ViewEndGame;
 			
 			// Instruction text
 			m_tInstructions = new FlxText(0, FlxG.height -32, FlxG.width, "");
@@ -90,6 +94,7 @@ package states
 			
 			s_layerForeground = new FlxGroup;
 			s_layerForeground.add(m_tParticipantList.m_aGraphics);
+			s_layerForeground.add(m_tEndgameView.m_aGraphics);
 			s_layerForeground.add(m_tDialogBox.m_aGraphics);
 			s_layerForeground.add(m_tInstructionsShadow);
 			s_layerForeground.add(m_tInstructions);
@@ -155,7 +160,7 @@ package states
 						if (m_iCurrentYear == 5)
 						{
 							// ENDGAME time
-							m_iCurrentState = e_STATE_ENDGAME
+							m_iCurrentState = e_STATE_ENDGAME1;
 						}
 						else
 							m_iCurrentState = e_STATE_YEARSTART;
@@ -296,6 +301,8 @@ package states
 								if (m_aParticipants.members[i].m_bEliminate)
 								{
 									m_aParticipants.members[i].exists = false;
+									m_aParticipants.members[i].m_tTrainingImg1.exists = false;
+									m_aParticipants.members[i].m_tTrainingImg2.exists = false;
 									m_aParticipants.members.splice(i--, 1);
 								}
 							}
@@ -311,6 +318,8 @@ package states
 								if (m_aParticipants.members[i].m_bEliminate)
 								{
 									m_aParticipants.members[i].exists = false;
+									m_aParticipants.members[i].m_tTrainingImg1.exists = false;
+									m_aParticipants.members[i].m_tTrainingImg2.exists = false;
 									m_aParticipants.members.splice(i--, 1);
 								}
 							}
@@ -337,6 +346,69 @@ package states
 					
 					m_tInstructions.text = "1 - Toggle skill view, 2 - Toggle elimination, 3 - Confirm choices";
 					m_tInstructionsShadow.text = "1 - Toggle skill view, 2 - Toggle elimination, 3 - Confirm choices";
+				}
+			}
+			else if (m_iCurrentState == e_STATE_ENDGAME1)
+			{
+				if (m_tEndgameView.getIsActive())
+				{
+					if (FlxG.keys.justPressed("ONE"))
+					{
+						m_tEndgameView.setIsActive(false);
+						m_iCurrentState = e_STATE_ENDGAME2;
+					}
+				}
+				else
+				{
+					for (i = 0; i < m_aParticipants.members.length; i++)
+						m_tEndgameView.m_aFinalFive.add(m_aParticipants.members[i]);
+					
+					m_tEndgameView.setPreview();
+					m_tEndgameView.setIsActive(true);
+					
+					m_tInstructions.text = "1 - Continue";
+					m_tInstructionsShadow.text = "1 - Continue";
+				}
+			}
+			else if (m_iCurrentState == e_STATE_ENDGAME2)
+			{
+				if (m_tEndgameView.getIsActive())
+				{
+					if (FlxG.keys.justPressed("ONE"))
+					{
+						m_tEndgameView.setIsActive(false);
+						m_iCurrentState = e_STATE_ENDGAME3;
+					}
+				}
+				else
+				{
+					m_tEndgameView.setResults();
+					m_tEndgameView.setIsActive(true);
+					
+					m_tInstructions.text = "1 - Continue";
+					m_tInstructionsShadow.text = "1 - Continue";
+				}
+			}
+			else if (m_iCurrentState == e_STATE_ENDGAME3)
+			{
+				if (m_tEndgameView.getIsActive())
+				{
+					if (FlxG.keys.justPressed("ONE"))
+					{
+						m_tEndgameView.setIsActive(false);
+						m_iCurrentState = e_STATE_YEARINTRO;
+						m_iCurrentYear = 0;
+						
+						FlxG.state = new MenuState();
+					}
+				}
+				else
+				{
+					m_tEndgameView.setFinale();
+					m_tEndgameView.setIsActive(true);
+					
+					m_tInstructions.text = "1 - Exit";
+					m_tInstructionsShadow.text = "1 - Exit";
 				}
 			}
 		}

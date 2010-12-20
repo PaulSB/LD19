@@ -145,7 +145,7 @@ package
 		{
 			if (m_iTraining1 == 0)
 			{
-				return "";
+				return "-";
 			}
 			else if (m_iTraining2 == 0)
 			{
@@ -197,7 +197,7 @@ package
 				}
 			}
 			
-			return "";
+			return "-";
 		}
 		
 		public function setClassRating():void
@@ -226,7 +226,7 @@ package
 		{
 			m_iAge++;
 			
-			var fMod:Number = m_iAge / 5.0;
+			var fMod:Number = (m_iAge-1) / 5.0;
 			m_iCurrentDefend = m_iPotentialDefend * fMod;
 			m_iCurrentMelee = m_iPotentialMelee * fMod;
 			m_iCurrentRanged = m_iPotentialRanged * fMod;
