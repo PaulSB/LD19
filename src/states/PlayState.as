@@ -85,10 +85,10 @@ package states
 			m_tInstructionsShadow = new FlxText(0 +2, FlxG.height -32 +2, FlxG.width, "");
 			m_tInstructionsShadow.setFormat("Istria", 20, 0xff000000, "center");
 			
-			m_tWarningText = new FlxText(0, FlxG.height * 0.5 -24, FlxG.width, "");
+			m_tWarningText = new FlxText(15, FlxG.height * 0.5 -24, FlxG.width-30, "");
 			m_tWarningText.setFormat("Istria", 32, 0xff48586d, "center");
 			m_tWarningText.alpha = 0;
-			m_tWarningBacking = new FlxSprite(10, m_tWarningText.y -4);
+			m_tWarningBacking = new FlxSprite(10, m_tWarningText.y -8);
 			m_tWarningBacking.loadGraphic(imgWarningBox);
 			m_tWarningBacking.alpha = 0;
 			
@@ -162,7 +162,7 @@ package states
 					{
 						m_tWarningText.alpha = 0;
 						m_tWarningBacking.alpha = 0;
-						m_fWarningTimer = 3.0;
+						m_fWarningTimer = 4.0;
 					}
 				}
 			}
@@ -494,86 +494,93 @@ package states
 				var pThisGuy:Participant = m_aParticipants.members[i];
 				pThisGuy.ageOneYear();
 				
-				if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
-					pThisGuy.m_bRevealDefend = true;
-				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
-					pThisGuy.m_bRevealMelee = true;
-				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
-					pThisGuy.m_bRevealRanged = true;
-				else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
-					pThisGuy.m_bRevealMagic = true;
-				else if (pThisGuy.m_tTrainingImg2.exists)
+				if (pThisGuy.m_iThisYearTraining != pThisGuy.e_SKILL_DO_NOTHING)
 				{
-					// Already fully trained! - BAIL
-				}
-				else if (pThisGuy.m_iThisYearTraining == pThisGuy.m_iTraining1)
-				{
-					// Can't train same discipline twice! - BAIL
-				}
-				else 
-				{
-					if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_DEFEND)
+					if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_DEFEND)
+						pThisGuy.m_bRevealDefend = true;
+					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MELEE)
+						pThisGuy.m_bRevealMelee = true;
+					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_RANGED)
+						pThisGuy.m_bRevealRanged = true;
+					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_ASSESS_MAGIC)
+						pThisGuy.m_bRevealMagic = true;
+					else if (pThisGuy.m_tTrainingImg2.exists)
 					{
-						pThisGuy.m_bTrainedDefend = true;
-						if (!pThisGuy.m_tTrainingImg1.exists)
-						{
-							pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_DEFEND;
-							pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgDefend);
-							pThisGuy.m_tTrainingImg1.exists = true;
-						}
-						else
-						{
-							pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_DEFEND;
-							pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgDefend);
-							pThisGuy.m_tTrainingImg2.exists = true;
-						}
+						// Already fully trained! - BAIL
+						m_tWarningText.text = "Remember: Full class-trained participants can gain nothing further from training!";
+						m_tWarningText.alpha = m_tWarningBacking.alpha = 1.0;
 					}
-					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_MELEE)
+					else if (pThisGuy.m_iThisYearTraining == pThisGuy.m_iTraining1)
 					{
-						pThisGuy.m_bTrainedMelee = true;
-						if (!pThisGuy.m_tTrainingImg1.exists)
-						{
-							pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_MELEE;
-							pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgMelee);
-							pThisGuy.m_tTrainingImg1.exists = true;
-						}
-						else
-						{
-							pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_MELEE;
-							pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgMelee);
-							pThisGuy.m_tTrainingImg2.exists = true;
-						}
+						// Can't train same discipline twice! - BAIL
+						m_tWarningText.text = "Remember: Each participant can only train a discipline once!";
+						m_tWarningText.alpha = m_tWarningBacking.alpha = 1.0;
 					}
-					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_RANGED)
+					else 
 					{
-						pThisGuy.m_bTrainedRanged = true;
-						if (!pThisGuy.m_tTrainingImg1.exists)
+						if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_DEFEND)
 						{
-							pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_RANGED;
-							pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgRanged);
-							pThisGuy.m_tTrainingImg1.exists = true;
+							pThisGuy.m_bTrainedDefend = true;
+							if (!pThisGuy.m_tTrainingImg1.exists)
+							{
+								pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_DEFEND;
+								pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgDefend);
+								pThisGuy.m_tTrainingImg1.exists = true;
+							}
+							else
+							{
+								pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_DEFEND;
+								pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgDefend);
+								pThisGuy.m_tTrainingImg2.exists = true;
+							}
 						}
-						else
+						else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_MELEE)
 						{
-							pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_RANGED;
-							pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgRanged);
-							pThisGuy.m_tTrainingImg2.exists = true;
+							pThisGuy.m_bTrainedMelee = true;
+							if (!pThisGuy.m_tTrainingImg1.exists)
+							{
+								pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_MELEE;
+								pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgMelee);
+								pThisGuy.m_tTrainingImg1.exists = true;
+							}
+							else
+							{
+								pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_MELEE;
+								pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgMelee);
+								pThisGuy.m_tTrainingImg2.exists = true;
+							}
 						}
-					}
-					else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_MAGIC)
-					{
-						pThisGuy.m_bTrainedMagic = true;
-						if (!pThisGuy.m_tTrainingImg1.exists)
+						else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_RANGED)
 						{
-							pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_MAGIC;
-							pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgMagic);
-							pThisGuy.m_tTrainingImg1.exists = true;
+							pThisGuy.m_bTrainedRanged = true;
+							if (!pThisGuy.m_tTrainingImg1.exists)
+							{
+								pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_RANGED;
+								pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgRanged);
+								pThisGuy.m_tTrainingImg1.exists = true;
+							}
+							else
+							{
+								pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_RANGED;
+								pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgRanged);
+								pThisGuy.m_tTrainingImg2.exists = true;
+							}
 						}
-						else
+						else if (pThisGuy.m_iThisYearTraining == pThisGuy.e_SKILL_TRAIN_MAGIC)
 						{
-							pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_MAGIC;
-							pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgMagic);
-							pThisGuy.m_tTrainingImg2.exists = true;
+							pThisGuy.m_bTrainedMagic = true;
+							if (!pThisGuy.m_tTrainingImg1.exists)
+							{
+								pThisGuy.m_iTraining1 = pThisGuy.e_SKILL_TRAIN_MAGIC;
+								pThisGuy.m_tTrainingImg1.loadGraphic(pThisGuy.imgMagic);
+								pThisGuy.m_tTrainingImg1.exists = true;
+							}
+							else
+							{
+								pThisGuy.m_iTraining2 = pThisGuy.e_SKILL_TRAIN_MAGIC;
+								pThisGuy.m_tTrainingImg2.loadGraphic(pThisGuy.imgMagic);
+								pThisGuy.m_tTrainingImg2.exists = true;
+							}
 						}
 					}
 				}

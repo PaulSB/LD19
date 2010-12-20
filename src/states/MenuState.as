@@ -19,9 +19,14 @@ package states
 			// Read XML data
 			new XmlData();
 			
-			// Title text
+			// Me
 			var tTxt:FlxText;
-			tTxt = new FlxText(0, 40, FlxG.width,
+			tTxt = new FlxText(0, 5, FlxG.width, "Created by Paul S Burgess for Ludum Dare 19");
+			tTxt.setFormat("Istria", 12, 0xffc7d7ec, "right");
+			add(tTxt);
+			
+			// Title text
+			tTxt = new FlxText(0, 50, FlxG.width,
 					"The Prophecy tells of The Five, the young band of "
 					+"warriors who would meet the Demon Lord in combat "
 					+"before his War of Chaos could decimate the land we "
