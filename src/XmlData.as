@@ -1,8 +1,6 @@
 package  
 {
-	import flash.events.Event;
-	import flash.net.URLLoader;
-	import flash.net.URLRequest;
+	import flash.utils.ByteArray;
 	import org.flixel.FlxU;
 	/**
 	 * LD19 - "Discovery"
@@ -10,6 +8,8 @@ package
 	 */
 	public class XmlData
 	{
+		[Embed(source='../data/xml/data.xml', mimeType="application/octet-stream")] public static const xmlFile:Class; 
+	
 		private var m_tXmlData:XML;
 		
 		static public var m_aForenames:Array;
@@ -22,13 +22,14 @@ package
 			m_aSurnames = new Array;
 			m_aYearStartText = new Array;
 			
-			var xmlLoader:URLLoader = new URLLoader(new URLRequest("../data/xml/data.xml"));
-			xmlLoader.addEventListener(Event.COMPLETE, processXML);
+			processXML();
 		}
 		
-		private function processXML(e:Event):void
+		private function processXML():void
 		{
-			m_tXmlData = new XML(e.target.data);
+			var file:ByteArray = new xmlFile;
+			var str:String = file.readUTFBytes( file.length );
+			m_tXmlData = new XML(str);
 			
 			for (var i:int = 0; i < 50; i++)
 			{
